@@ -60,14 +60,9 @@ class User extends AuthenticatableUser
         'profile_photo_url',
     ];
 
-    public function groups()
-{
-    return $this->hasManyThrough(Group::class, GroupUser::class, 'user_id', 'group_id');
-}
-// User model
-public function groupTasks()
-{
-    return $this->hasManyThrough(GroupTask::class, Group::class);
-}
+    public function todos()
+    {
+        return $this->hasMany(Todo::class);
+    }
 
 }
