@@ -30,14 +30,17 @@ class TodoController extends Controller
     return redirect()->route('todos.index');
 }
 
-public function update($id)
+public function update(Request $request, $id)
 {
-    $todo = Todo::findOrFail($id);
-
-    $todo->update([
-        'isDone' => !$todo->isDone,
-        'completed_at' => !$todo->isDone ? now() : null,
+    $validatedData = $request->validate([
+        'title' => 'required|max:255',
+        'description' => 'required',
     ]);
+
+    $todo = Todo::findOrFail($id);
+    $todo->title = $validatedData['title'];
+    $todo->description = $validatedData['description'];
+    $todo->save();
 
 
     return redirect()->route('todos.index');

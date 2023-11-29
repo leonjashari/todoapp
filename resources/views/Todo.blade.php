@@ -15,7 +15,7 @@
 <body class="bg-gray-200 p-4">
     <div class="lg:w-2/4 mx-auto py-8 px-6 bg-white rounded-xl">
         <div class="flex justify-end space-x-4"> <!-- Added space-x-4 for spacing between buttons -->
-            <!-- Logout button -->
+
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
@@ -48,7 +48,7 @@
                 </div>
 
                 <div class="flex space-x-3">
-      
+
                     <button class="py-2 px-2 bg-blue-500 text-white rounded-xl"
                         onclick="document.getElementById('editForm-{{ $todo->id }}').classList.remove('hidden')">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -58,7 +58,19 @@
                         </svg>
                     </button>
 
-              
+                    <div id="editForm-{{ $todo->id }}" class="hidden">
+                        <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
+                            @csrf
+                            @method('PATCH')
+                            <input type="text" name="title" value="{{ $todo->title }}"
+                                class="py-3 px-4 bg-gray-100 rounded-xl">
+                            <textarea name="description"
+                                class="py-3 px-4 bg-gray-100 rounded-xl">{{ $todo->description }}</textarea>
+                            <button type="submit"
+                                class="w-28 py-4 px-8 bg-green-500 text-white rounded-xl">Update</button>
+                        </form>
+                    </div>
+
                     <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
                         @csrf
                         @method('PATCH')
@@ -72,7 +84,7 @@
                         </button>
                     </form>
 
-           
+
                     <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
                         @csrf
                         @method('DELETE')

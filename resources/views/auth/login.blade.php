@@ -15,6 +15,12 @@
         <form action="{{ route('login') }}" method="post" class="mt-4">
             @csrf
 
+            @if ($errors->has('message'))
+                <div class="mb-3">
+                    <span class="text-red-500">{{ $errors->first('message') }}</span>
+                </div>
+            @endif
+
             <div class="mb-3">
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email address</label>
                 <input type="email" class="form-input w-full rounded-md shadow-sm border-gray-300 @error('email') is-invalid @enderror" id="email" name="email" placeholder="Enter email address" value="{{ old('email') }}" required>
@@ -39,4 +45,3 @@
 </body>
 
 </html>
-
