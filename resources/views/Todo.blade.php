@@ -14,10 +14,14 @@
 
 <body class="bg-gray-200 p-4">
     <div class="lg:w-2/4 mx-auto py-8 px-6 bg-white rounded-xl">
-        <div class="flex justify-end">
+        <div class="flex justify-end space-x-4"> <!-- Added space-x-4 for spacing between buttons -->
+            <!-- Logout button -->
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit">Logout</button>
+                <button type="submit"
+                    class="py-2 px-4 bg-red-500 text-white rounded-xl hover:bg-red-600 focus:outline-none focus:ring focus:border-blue-300">
+                    Logout
+                </button>
             </form>
         </div>
 
@@ -58,10 +62,12 @@
                     <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
                         @csrf
                         @method('PATCH')
-                        <button class="py-2 px-2 bg-green-500 text-white rounded-xl">
+                        <button type="submit"
+                            class="py-2 px-2 {{ $todo->isDone ? 'bg-blue-500' : 'bg-green-500' }} text-white rounded-xl">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="{{ $todo->isDone ? 'M4.5 12.75l6 6 9-13.5' : 'M4.5 12.75l6 6 9-13.5' }}" />
                             </svg>
                         </button>
                     </form>
@@ -81,10 +87,10 @@
                 </div>
 
                 <!-- "Added at" information -->
-                <div class="mt-2">
+                <div class="mt-2 ml-4"> <!-- Added ml-4 for margin-left -->
                     <p>Added at: {{ $todo->created_at->format('Y-m-d H:i') }}</p>
                     @if ($todo->completed_at)
-                        <p>Completed at: {{ $todo->completed_at->format('Y-m-d H:i') }}</p>
+                    <p>Completed at: {{ $todo->completed_at->format('Y-m-d H:i') }}</p>
                     @endif
                 </div>
             </div>

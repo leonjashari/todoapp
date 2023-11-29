@@ -30,11 +30,14 @@ class TodoController extends Controller
     return redirect()->route('todos.index');
 }
 
-    public function update(Todo $todo)
-    {
-        $todo->update(['isDone'=> true]);
-        return redirect()->route('todos.index');
-    }
+public function update($id)
+{
+    $todo = Todo::findOrFail($id);
+
+    $todo->update(['isDone' => !$todo->isDone]);
+
+    return redirect()->route('todos.index');
+}
     public function destroy(Todo $todo)
     {
         $todo->delete();
