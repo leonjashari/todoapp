@@ -50,4 +50,13 @@ class TodoController extends Controller
 
     return redirect('/todos');
 }
+
+public function complete(Todo $todo)
+{
+    $todo->completed_at = now();
+    $todo->save();
+
+    return redirect()->route('todos.index');
+}
+
 }

@@ -17,12 +17,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Welcome view
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Todos view
+
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
     ->group(function () {
         Route::get('/todos', [TodoController::class, 'index'])->name('todos.index');
@@ -32,7 +32,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 Route::post('/', [TodoController::class, 'store']);
 Route::post('/todos/{id}/edit', [TodoController::class, 'edit']);
-// Login and Register routes
+Route::post('/todos/{todo}/complete', [TodoController::class, 'complete'])->name('todos.complete');
+
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::get('/logout', [LogoutController::class, 'logout'])->name('logout');
