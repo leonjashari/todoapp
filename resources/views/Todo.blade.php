@@ -44,6 +44,7 @@
                 </div>
 
                 <div class="flex space-x-3">
+                    <!-- Edit button -->
                     <button class="py-2 px-2 bg-blue-500 text-white rounded-xl"
                         onclick="document.getElementById('editForm-{{ $todo->id }}').classList.remove('hidden')">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -53,16 +54,7 @@
                         </svg>
                     </button>
 
-                    <form id="editForm-{{ $todo->id }}" class="hidden flex flex-col space-y-4" method="POST"
-                        action="{{ url('/todos/' . $todo->id . '/edit') }}">
-                        @csrf
-                        <input type="text" name="title" value="{{ $todo->title }}"
-                            class="py-3 px-4 bg-gray-100 rounded-xl">
-                        <textarea name="description"
-                            class="py-3 px-4 bg-gray-100 rounded-xl">{{ $todo->description }}</textarea>
-                        <button class="w-28 py-4 px-8 bg-green-500 text-white rounded-xl">Update</button>
-                    </form>
-
+                    <!-- Done button -->
                     <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
                         @csrf
                         @method('PATCH')
@@ -74,20 +66,7 @@
                         </button>
                     </form>
 
-                    <div>
-                        <h2>{{ $todo->title }}</h2>
-                        <p>{{ $todo->description }}</p>
-                        <p>Added at: {{ $todo->created_at->format('Y-m-d H:i') }}</p>
-                        @if ($todo->completed_at)
-                        <p>Completed at: {{ $todo->completed_at->format('Y-m-d H:i') }}</p>
-                        @endif
-
-
-                        @if ($todo->completed_at)
-                        <p>Completed at: {{ $todo->completed_at->format('Y-m-d H:i') }}</p>
-                        @endif
-                    </div>
-
+                    <!-- Delete button -->
                     <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
                         @csrf
                         @method('DELETE')
@@ -99,6 +78,14 @@
                             </svg>
                         </button>
                     </form>
+                </div>
+
+                <!-- "Added at" information -->
+                <div class="mt-2">
+                    <p>Added at: {{ $todo->created_at->format('Y-m-d H:i') }}</p>
+                    @if ($todo->completed_at)
+                        <p>Completed at: {{ $todo->completed_at->format('Y-m-d H:i') }}</p>
+                    @endif
                 </div>
             </div>
             @endforeach
