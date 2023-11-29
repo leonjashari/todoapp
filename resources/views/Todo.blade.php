@@ -48,7 +48,7 @@
                 </div>
 
                 <div class="flex space-x-3">
-                    <!-- Edit button -->
+      
                     <button class="py-2 px-2 bg-blue-500 text-white rounded-xl"
                         onclick="document.getElementById('editForm-{{ $todo->id }}').classList.remove('hidden')">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -58,7 +58,7 @@
                         </svg>
                     </button>
 
-                    <!-- Done button -->
+              
                     <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
                         @csrf
                         @method('PATCH')
@@ -72,7 +72,7 @@
                         </button>
                     </form>
 
-                    <!-- Delete button -->
+           
                     <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
                         @csrf
                         @method('DELETE')
@@ -86,13 +86,19 @@
                     </form>
                 </div>
 
-                <!-- "Added at" information -->
-                <div class="mt-2 ml-4"> <!-- Added ml-4 for margin-left -->
+                <div class="mt-2 ml-4">
                     <p>Added at: {{ $todo->created_at->format('Y-m-d H:i') }}</p>
-                    @if ($todo->completed_at)
-                    <p>Completed at: {{ $todo->completed_at->format('Y-m-d H:i') }}</p>
+                    @if ($todo->isDone)
+                    <p>Completed at:
+                        {{
+                        is_string($todo->completed_at) ?
+                        \Carbon\Carbon::parse($todo->completed_at)->format('Y-m-d H:i') :
+                        ($todo->completed_at ? $todo->completed_at->format('Y-m-d H:i') : 'Not available')
+                        }}
+                    </p>
                     @endif
                 </div>
+
             </div>
             @endforeach
         </div>

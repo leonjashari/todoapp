@@ -34,7 +34,11 @@ public function update($id)
 {
     $todo = Todo::findOrFail($id);
 
-    $todo->update(['isDone' => !$todo->isDone]);
+    $todo->update([
+        'isDone' => !$todo->isDone,
+        'completed_at' => !$todo->isDone ? now() : null,
+    ]);
+
 
     return redirect()->route('todos.index');
 }
