@@ -15,8 +15,14 @@
         <form action="{{ route('login') }}" method="post" class="mt-4">
             @csrf
 
+            @if ($errors->has('message'))
+                <div class="mb-3">
+                    <span class="text-red-500">{{ $errors->first('message') }}</span>
+                </div>
+            @endif
+
             <div class="mb-3">
-                <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email address</label>
+                <label for="email" class="form-label">Email address</label>
                 <input type="email" class="form-input w-full rounded-md shadow-sm border-gray-300 @error('email') is-invalid @enderror" id="email" name="email" placeholder="Enter email address" value="{{ old('email') }}" required>
                 @error('email')
                     <span class="text-red-500">{{ $message }}</span>
@@ -24,7 +30,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
+                <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-input w-full rounded-md shadow-sm border-gray-300 @error('password') is-invalid @enderror" id="password" name="password" placeholder="Enter password" required>
                 @error('password')
                     <span class="text-red-500">{{ $message }}</span>

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Todo;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +12,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        // Seed urgent task
+        Todo::create([
+            'title' => 'Urgent Task',
+            'description' => 'This is an urgent task.',
+            'group' => 1,
+            'urgent' => true,
+        ]);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        // You can seed other tasks here if needed
     }
 }

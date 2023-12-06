@@ -2,121 +2,236 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    <!-- Meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laravel</title>
+    <title>Laravel Todo App</title>
 
-    <!-- Styles -->
+    <!-- Fonts and stylesheets -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
 </head>
 
-<body class="bg-gray-200 p-4">
-    <div class="lg:w-2/4 mx-auto py-8 px-6 bg-white rounded-xl">
-        <div class="flex justify-end space-x-4"> <!-- Added space-x-4 for spacing between buttons -->
+<body class="bg-gray-100 p-4">
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b border-gray-200 py-4">
+        <!-- User info -->
+        <div class="flex items-center">
+            <p class="font-bold text-lg mr-4">Welcome, {{ Auth::user()->name }}</p>
+        </div>
 
+       <!-- Navigation links in the middle -->
+<div class="flex-grow text-center">
+    <a href="{{ url('/todos') }}"
+        class="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-xl {{ !request()->get('group') ? 'font-bold' : '' }}">To
+        Do</a>
+    <a href="{{ route('todos.done') }}"
+        class="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-xl {{ request()->get('group') === 'done' ? 'font-bold' : '' }}">Done</a>
+</div>
+
+        <!-- Space between Logout and Search -->
+        <div class="flex-grow"></div>
+
+        <!-- Search form on the right -->
+        <form method="GET" action="{{ route('todos.index') }}">
+            <input type="text" name="search" placeholder="Search Tasks"
+                class="px-4 py-2 rounded-xl border-gray-300 focus:border-blue-500" />
+            <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded-xl">
+                Search
+            </button>
+        </form>
+
+        <!-- Add some space between Logout and Search -->
+        <div class="w-4"></div>
+
+        <!-- Logout button on the right -->
+        <div class="flex items-center space-x-4">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                    class="py-2 px-4 bg-red-500 text-white rounded-xl hover:bg-red-600 focus:outline-none focus:ring focus:border-blue-300">
+                    class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">
                     Logout
                 </button>
             </form>
         </div>
+    </div>
 
-        <h1 class="font-bold text-5xl text-center mb-8">Laravel + Tailwind</h1>
-
-        <div class="mb-6">
-            <form class="flex flex-col space-y-4" method="POST" action="{{ url('/') }}">
+    <div class="flex">
+<!-- List of Groups (moved to the very left) -->
+<div class="w-1/6 bg-gray-200 p-4 rounded-xl">
+    <h3 class="font-bold text-lg mb-4">Task Groups</h3>
+    <ul id="taskGroups" class="space-y-2 font-bold">
+        <li>
+            <a href="{{ route('todos.urgent') }}" class="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-xl font-bold">
+                Urgent
+            </a>
+        </li>
+        @for ($i = 1; $i <= 4; $i++)
+            <li>
+                <a href="{{ route('todos.group', ['group' => $i]) }}">
+                    Group {{ $i }}
+                </a>
+                <!-- Add a link to completed tasks for each group -->
+                <a href="{{ route('todos.group.done', ['group' => $i]) }}" class="text-blue-500 hover:underline ml-2">
+                    (Completed)
+                </a>
+            </li>
+        @endfor
+        <li>
+            <!-- Add Group Form -->
+            <form method="POST" action="{{ route('todos.addGroup') }}" class="flex items-center space-x-2">
                 @csrf
-                <input type="text" name="title" placeholder="The todo title" class="py-3 px-4 bg-gray-100 rounded-xl">
-                <textarea name="description" placeholder="The todo description"
-                    class="py-3 px-4 bg-gray-100 rounded-xl"></textarea>
-                <button class="w-28 py-4 px-8 bg-green-500 text-white rounded-xl">Add</button>
+                <input type="text" name="newGroup" placeholder="New Group" class="w-32 py-1 px-2 rounded-md border border-gray-300">
+                <button type="submit" class="py-1 px-2 bg-blue-500 text-white rounded-md">Add</button>
             </form>
-        </div>
+        </li>
+    </ul>
+</div>
 
-        <hr>
+        <!-- Task List -->
+        <div class="flex-1 lg:w-4/5 p-4 overflow-auto">
+            <div class="mb-4">
+                <h2 class="font-bold text-2xl">Tasks</h2>
+            </div>
+            <!-- Task List Container with Limited Height -->
+            <div class="flex flex-col h-screen overflow-hidden">
+                <!-- Task List Content -->
+                <div class="flex-1 overflow-y-scroll">
+                    <div class="space-y-4">
+                        @forelse ($todos as $todo)
+                            @if (!$todo->completed_at)
+                                <div
+                                    class="flex items-center border-b border-gray-300 py-4 px-3 {{ $todo->isDone ? 'bg-green-200' : '' }}">
+                                    <!-- Mark as Done Button -->
+                                    <form method="POST" action="{{ route('todos.markAsDone', $todo->id) }}"
+                                        class="mr-4">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="flex items-center focus:outline-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor" class="w-6 h-6 text-green-500">
+                                                <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                            </svg>
+                                        </button>
+                                    </form>
 
-        <div class="mt-2">
-            @foreach ($todos as $todo)
-            <div class="py-4 flex items-center border-b border-gray-300 px-3 {{ $todo->isDone ? 'bg-green-200' : '' }}">
-                <div class="flex-1 pr-8">
-                    <h3 class="text-lg font-semibold">{{ $todo->title }}</h3>
-                    <p class="text-gray-500">{{ $todo->description }}</p>
+                                    <!-- Task Details -->
+                                    <div class="flex-1 pr-8">
+                                        <h3 class="text-lg font-semibold">{{ $todo->title }}</h3>
+                                        <p class="text-gray-500">{{ $todo->description }}</p>
+                                        <p>(Group {{ $todo->group }})</p>
+                                    </div>
+
+                                    <!-- Task Action Buttons -->
+                                    <div class="flex space-x-3">
+                                        <!-- Edit Task Button -->
+                                        <button class="py-2 px-2 bg-blue-500 text-white rounded-xl"
+                                            onclick="toggleEditForm({{ $todo->id }})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 20h9M16 4l-8 8-4-4v10h10l-4-4 8-8" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Edit Task Form -->
+                                        <div id="editForm-{{ $todo->id }}" class="hidden">
+                                            <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="text" name="title" value="{{ $todo->title }}"
+                                                    class="py-3 px-4 bg-gray-100 rounded-xl">
+                                                <textarea name="description"
+                                                    class="py-3 px-4 bg-gray-100 rounded-xl">{{ $todo->description }}</textarea>
+                                                <button type="submit"
+                                                    class="w-28 py-4 px-8 bg-green-500 text-white rounded-xl">Update</button>
+                                            </form>
+                                        </div>
+
+                                        <!-- Delete Task Button -->
+                                        <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="py-2 px-2 bg-red-500 text-white rounded-xl">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.02.165
+                                                        m-1.02-.165l-2.758 7.144m0 0l-2.774-7.144c.342-.052.682-.107 1.02-.165l-1.02.165
+                                                        m2.758-7.144l2.774 7.144" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endif
+                        @empty
+                            <p class="text-gray-500">No tasks found.</p>
+                        @endforelse
+                    </div>
                 </div>
+                <!-- Separator Line -->
+                <hr class="my-2 border-t-2 border-gray-300 mx-auto">
 
-                <div class="flex space-x-3">
-
-                    <button class="py-2 px-2 bg-blue-500 text-white rounded-xl"
-                        onclick="document.getElementById('editForm-{{ $todo->id }}').classList.remove('hidden')">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 20h9M16 4l-8 8-4-4v10h10l-4-4 8-8" />
-                        </svg>
-                    </button>
-
-                    <div id="editForm-{{ $todo->id }}" class="hidden">
-                        <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
+                <!-- Add New Task Form -->
+                <div class="flex-1 lg:w-4/5 p-4 overflow-auto">
+                    <div id="taskForm" class="pb-4">
+                        <form method="POST" action="{{ url('/') }}" class="flex flex-col space-x-4">
                             @csrf
-                            @method('PATCH')
-                            <input type="text" name="title" value="{{ $todo->title }}"
-                                class="py-3 px-4 bg-gray-100 rounded-xl">
-                            <textarea name="description"
-                                class="py-3 px-4 bg-gray-100 rounded-xl">{{ $todo->description }}</textarea>
-                            <button type="submit"
-                                class="w-28 py-4 px-8 bg-green-500 text-white rounded-xl">Update</button>
+                            <!-- Task details input fields -->
+                            <label for="title" class="font-bold">Title:</label>
+                            <div class="flex items-center space-x-4">
+                                <input type="text" name="title" id="title" placeholder="New Task Title"
+                                    class="flex-1 px-4 py-2 border rounded-xl" required>
+                                <!-- Add Task Button -->
+                                <button type="submit"
+                                    class="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Task details input fields -->
+                            <label for="description" class="font-bold">Description:</label>
+                            <textarea name="description" id="description" class="px-4 py-2 border rounded-xl"
+                                required></textarea>
+
+                            <!-- Additional task options -->
+                            <div class="flex items-center space-x-4">
+                                <label for="urgent" class="font-bold">Urgent:</label>
+                                <input type="checkbox" name="urgent" value="1">
+
+                                <label for="group" class="font-bold">Select Group:</label>
+                                <select name="group" id="group" class="px-4 py-2 border rounded-xl" required>
+                                    @for ($i = 1; $i <= 4; $i++)
+                                        <option value="{{ $i }}">Group {{ $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
                         </form>
                     </div>
-
-                    <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit"
-                            class="py-2 px-2 {{ $todo->isDone ? 'bg-blue-500' : 'bg-green-500' }} text-white rounded-xl">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="{{ $todo->isDone ? 'M4.5 12.75l6 6 9-13.5' : 'M4.5 12.75l6 6 9-13.5' }}" />
-                            </svg>
-                        </button>
-                    </form>
-
-
-                    <form method="POST" action="{{ url('/todos/' . $todo->id) }}">
-                        @csrf
-                        @method('DELETE')
-                        <button class="py-2 px-2 bg-red-500 text-white rounded-xl">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                            </svg>
-                        </button>
-                    </form>
                 </div>
-
-                <div class="mt-2 ml-4">
-                    <p>Added at: {{ $todo->created_at->format('Y-m-d H:i') }}</p>
-                    @if ($todo->isDone)
-                    <p>Completed at:
-                        {{
-                        is_string($todo->completed_at) ?
-                        \Carbon\Carbon::parse($todo->completed_at)->format('Y-m-d H:i') :
-                        ($todo->completed_at ? $todo->completed_at->format('Y-m-d H:i') : 'Not available')
-                        }}
-                    </p>
-                    @endif
-                </div>
-
             </div>
-            @endforeach
         </div>
     </div>
 
+    <!-- JavaScript -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <script>
+        function toggleEditForm(id) {
+            document.getElementById('editForm-' + id).classList.toggle('hidden');
+        }
+
+        function toggleTaskForm() {
+            document.getElementById('taskForm').classList.toggle('hidden');
+        }
+    </script>
 </body>
 
 </html>

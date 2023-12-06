@@ -9,10 +9,22 @@ class Todo extends Model
 {
     use HasFactory;
 
+    public function markAsDone()
+    {
+        $this->completed_at = now();
+        $this->save();
+    }
     protected $guarded = [] ;
 
     public function user()
 {
     return $this->belongsTo(User::class);
 }
+
+public function index()
+{
+    $todos = Todo::all();
+    return view('todo', compact('todos'));
+}
+
 }

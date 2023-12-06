@@ -28,6 +28,7 @@
 
         <div class="mt-2">
             @foreach ($todos as $todo)
+            @if (!$todo->completed_at)
                 <div class="py-4 flex items-center border-b border-gray-300 px-3">
                     <div class="flex-1 pr-8">
                         <h3 class="text-lg font-semibold">{{ $todo->title}}</h3>
